@@ -1,0 +1,84 @@
+import undetected_chromedriver as uc
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import pandas as pd
+import time
+
+PLAYER_IDS = [114422, 114957, 114962, 117457, 118893, 119437, 119454, 119646, 119732, 124286, 124439, 124879, 124911, 125047, 132361, 132948, 135349, 135890, 136441, 136442, 136468, 136851, 136956, 137102, 139254, 139386, 139762, 140042, 140061, 141282, 142220, 142410, 142411, 142412, 142420, 142445, 142561, 142562, 142565, 142568, 142581, 142670, 142676, 142679, 142710, 142741, 142744, 142747, 142855, 143803, 143896, 143996, 144005, 144415, 146409, 146600, 147263, 147273, 147421, 147473, 147554, 147721, 148120, 148636, 149118, 150382, 150436, 150741, 151390, 151391, 151404, 151817, 151871, 152349, 152370, 152405, 152408, 152506, 152518, 152537, 152547, 152619, 152692, 152713, 152742, 152752, 152753, 152845, 152866, 153050, 153200, 153369, 153387, 153388, 153389, 153395, 154918, 156676, 157065, 157309, 157317, 157318, 157321, 157322, 157324, 157327, 157353, 157359, 157588, 157872, 158881, 158933, 159747, 160142, 160148, 160149, 160487, 161930, 161933, 161939, 161942, 162081, 162122, 162520, 162543, 162546, 162788, 162790, 163028, 163030, 163038, 163087, 163176, 163309, 163447, 163516, 163519, 163555, 163563, 163592, 164029, 164031, 164088, 164124, 164125, 164146, 164158, 164160, 164163, 164313, 164897, 164913, 164985, 165212, 165921, 165953, 167803, 168175, 168268, 168269, 168412, 168418, 168461, 168562, 168715, 168718, 168747, 168914, 168918, 168923, 169299, 169310, 169578, 169728, 169859, 170104, 171595, 172893, 172961, 172988, 172989, 173249, 173250, 173251, 173256, 174074, 174076, 174158, 174213, 174256, 174297, 174373, 174460, 174462, 174484, 174660, 174807, 174853, 174902, 174908, 175219, 176165, 176172, 176222, 176897, 177006, 178341, 178761, 178762, 179414, 179527, 179568, 179839, 179978, 180586, 180990, 181103, 181197, 181605, 181806, 181809, 181816, 181883, 181889, 182150, 182291, 182292, 182299, 182322, 182325, 182409, 182414, 182435, 182436, 182462, 182466, 182469, 182470, 182474, 182475, 182479, 182488, 182717, 182809, 182812, 182827, 182851, 183138, 183274, 183444, 183453, 183831, 183849, 184322, 185275, 185708, 185855, 186071, 186251, 186253, 186258, 187466, 187493, 187495, 187514, 188032, 188090, 188320, 188335, 188500, 188506, 188507, 188895, 188935, 189032, 189033, 189039, 189064, 189134, 189274, 189663, 189664, 189898, 189903, 191122, 191376, 191424, 191779, 192041, 192647, 192814, 192835, 192842, 193117, 193271, 193299, 193312, 194199, 194452, 195207, 195275, 195351, 196687, 196751, 198660, 198682, 200576, 200666, 200746, 201218, 201232, 201415, 201698, 201866, 202582, 202776, 202863, 203735, 207656, 209863, 210661, 210663, 211065, 212847, 213199, 214587, 214681, 222297, 229281, 233618, 237900]
+
+BASE_URL = "https://es.volleyballworld.com/volleyball/competitions/volleyball-nations-league/players/"
+
+options = uc.ChromeOptions()
+options.add_argument("--headless")
+driver = uc.Chrome(options=options)
+wait = WebDriverWait(driver, 15)
+
+def safe_text(selector, default="-"):
+    try:
+        return driver.find_element(By.CSS_SELECTOR, selector).text.strip()
+    except:
+        return default
+
+def scrape_player(player_id):
+    driver.get(BASE_URL + str(player_id))
+    try:
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".vbw-player-name")))
+    except:
+        print(f"  Timeout: {player_id}")
+        return None
+
+    # Datos básicos
+    name      = safe_text("h1.vbw-player-name")
+    team      = safe_text("a.player-team-text")
+    position  = safe_text(".vbw-player-bio-col:nth-child(2) .vbw-player-bio-text.--desktop")
+    age       = safe_text(".vbw-player-bio-col:nth-child(4) .vbw-player-bio-text")
+    height    = safe_text(".vbw-player-bio-col:nth-child(6) .vbw-player-bio-text")
+
+    # Estadísticas — los 11 valores de vbw-player-stats-text en orden:
+    # 0: total_points | 1: avg_per_match
+    # 2: attack_pts   | 3: attack_eff   | 4: attack_avg
+    # 5: block_pts    | 6: block_eff    | 7: block_avg
+    # 8: serve_pts    | 9: serve_eff    | 10: serve_avg
+    stats = driver.find_elements(By.CSS_SELECTOR, ".vbw-player-stats-text")
+    def st(i): return stats[i].text.strip() if i < len(stats) else "-"
+
+    return {
+        "id":            player_id,
+        "name":          name,
+        "team":          team,
+        "position":      position,
+        "age":           age,
+        "height_cm":     height.replace("cm", "").strip(),
+        "total_points":  st(0),
+        "avg_per_match": st(1),
+        "attack_pts":    st(2),
+        "attack_eff":    st(3),
+        "attack_avg":    st(4),
+        "block_pts":     st(5),
+        "block_eff":     st(6),
+        "block_avg":     st(7),
+        "serve_pts":     st(8),
+        "serve_eff":     st(9),
+        "serve_avg":     st(10),
+    }
+
+players = []
+total = len(PLAYER_IDS)
+
+for i, pid in enumerate(PLAYER_IDS):
+    print(f"[{i+1}/{total}] {pid}...", end=" ")
+    data = scrape_player(pid)
+    if data:
+        players.append(data)
+        print(f"✓ {data['name']} ({data['team']})")
+    else:
+        print("✗ Error")
+    time.sleep(1.5)
+
+driver.quit()
+
+df = pd.DataFrame(players)
+df.to_csv("vnl2026_raw.csv", index=False)
+print(f"\n✓ Guardados {len(df)} jugadores en vnl2026_raw.csv")
+print(df.head())
