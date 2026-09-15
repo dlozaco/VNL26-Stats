@@ -339,8 +339,10 @@ PLAYER_IDS = [
     233618,
     237900,
 ]
-
-BASE_URL = "https://en.volleyballworld.com/volleyball/competitions/volleyball-nations-league/players/"
+BASE_URL = (
+    "https://en.volleyballworld.com/volleyball/competitions/"
+    "volleyball-nations-league/players/"
+)
 
 options = uc.ChromeOptions()
 options.add_argument("--headless")
@@ -349,23 +351,24 @@ wait = WebDriverWait(driver, 15)
 
 
 def safe_text(selector, default="-"):
+    """Extrae el contenido de texto de un elemento o devuelve un valor por defecto."""
     try:
         return driver.find_element(By.CSS_SELECTOR, selector).text.strip()
-    except:
+    except Exception:
         return default
 
 
 def scrape_player(player_id):
+    """Obtiene los datos demográficos y métricas de juego de un jugador."""
     driver.get(BASE_URL + str(player_id))
     try:
         wait.until(
             EC.presence_of_element_located((By.CSS_SELECTOR, ".vbw-player-name"))
         )
-    except:
+    except Exception:
         print(f"  Timeout: {player_id}")
         return None
 
-    # Datos básicos
     name = safe_text("h1.vbw-player-name")
     team = safe_text("a.player-team-text")
     position = safe_text(
@@ -374,15 +377,10 @@ def scrape_player(player_id):
     age = safe_text(".vbw-player-bio-col:nth-child(4) .vbw-player-bio-text")
     height = safe_text(".vbw-player-bio-col:nth-child(6) .vbw-player-bio-text")
 
-    # Estadísticas — los 11 valores de vbw-player-stats-text en orden:
-    # 0: total_points | 1: avg_per_match
-    # 2: attack_pts   | 3: attack_eff   | 4: attack_avg
-    # 5: block_pts    | 6: block_eff    | 7: block_avg
-    # 8: serve_pts    | 9: serve_eff    | 10: serve_avg
     stats = driver.find_elements(By.CSS_SELECTOR, ".vbw-player-stats-text")
 
-    def st(i):
-        return stats[i].text.strip() if i < len(stats) else "-"
+    def st(idx):
+        return stats[idx].text.strip() if idx < len(stats) else "-"
 
     return {
         "id": player_id,
@@ -406,10 +404,10 @@ def scrape_player(player_id):
 
 
 players = []
-total = len(PLAYER_IDS)
+TOTAL = len(PLAYER_IDS)
 
 for i, pid in enumerate(PLAYER_IDS):
-    print(f"[{i + 1}/{total}] {pid}...", end=" ")
+    print(f"[{i + 1}/{TOTAL}] {pid}...", end=" ")
     data = scrape_player(pid)
     if data:
         players.append(data)

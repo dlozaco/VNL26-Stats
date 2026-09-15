@@ -1,3 +1,5 @@
+
+
 import re
 import time
 
@@ -16,7 +18,10 @@ categories = [
     "best-receivers",
 ]
 
-BASE = "https://es.volleyballworld.com/volleyball/competitions/volleyball-nations-league/statistics/men/"
+BASE = (
+    "https://es.volleyballworld.com/volleyball/competitions/"
+    "volleyball-nations-league/statistics/men/"
+)
 
 options = uc.ChromeOptions()
 options.add_argument("--headless")
@@ -32,7 +37,7 @@ for cat in categories:
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "a[href*='/players/']"))
         )
-    except:
+    except Exception:
         print(f"Timeout en {cat}")
         continue
 
