@@ -1,3 +1,5 @@
+"""Scrape biographical data and technical statistics for VNL players."""
+
 import time
 
 import pandas as pd
@@ -352,7 +354,6 @@ wait = WebDriverWait(driver, 15)
 
 
 def safe_text(selector, default="-"):
-    """Extrae el contenido de texto de un elemento o devuelve un valor por defecto."""
     try:
         return driver.find_element(By.CSS_SELECTOR, selector).text.strip()
     except NoSuchElementException:
@@ -360,7 +361,6 @@ def safe_text(selector, default="-"):
 
 
 def scrape_player(player_id):
-    """Obtiene los datos demográficos y métricas de juego de un jugador."""
     driver.get(BASE_URL + str(player_id))
     try:
         wait.until(

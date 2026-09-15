@@ -1,4 +1,4 @@
-"""Módulo para recolectar identificadores de jugadores de la VNL."""
+"""Scrap unique player profile IDs across VNL skill leaderboards."""
 
 import re
 import time

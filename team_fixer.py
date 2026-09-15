@@ -1,3 +1,5 @@
+"""Impute missing or unassigned national teams ('TBD' / '-') using a verified mapping."""
+
 import pandas as pd
 
 df = pd.read_csv("vnl2026_TBD.csv")
