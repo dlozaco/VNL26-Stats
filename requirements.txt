@@ -1,0 +1,7 @@
+undetected-chromedriver
+selenium
+pandas
+numpy
+matplotlib
+seaborn
+jupyterlab
