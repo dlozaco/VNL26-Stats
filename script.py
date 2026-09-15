@@ -354,6 +354,7 @@ wait = WebDriverWait(driver, 15)
 
 
 def safe_text(selector, default="-"):
+    """Extract stripped text from a DOM element or return a fallback value."""
     try:
         return driver.find_element(By.CSS_SELECTOR, selector).text.strip()
     except NoSuchElementException:
@@ -361,6 +362,7 @@ def safe_text(selector, default="-"):
 
 
 def scrape_player(player_id):
+    """Scrape demographic profile data and match metrics for a single player ID."""
     driver.get(BASE_URL + str(player_id))
     try:
         wait.until(

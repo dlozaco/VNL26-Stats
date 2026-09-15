@@ -31,8 +31,8 @@ driver = uc.Chrome(options=options)
 all_ids = []
 
 for cat in categories:
-    URL = BASE + cat + "/"
-    driver.get(URL)
+    data_url = BASE + cat + "/"
+    driver.get(data_url)
 
     try:
         WebDriverWait(driver, 15).until(
