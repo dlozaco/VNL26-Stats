@@ -1,9 +1,10 @@
-
+"""Módulo para recolectar identificadores de jugadores de la VNL."""
 
 import re
 import time
 
 import undetected_chromedriver as uc
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -30,14 +31,14 @@ driver = uc.Chrome(options=options)
 all_ids = []
 
 for cat in categories:
-    url = BASE + cat + "/"
-    driver.get(url)
+    URL = BASE + cat + "/"
+    driver.get(URL)
 
     try:
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "a[href*='/players/']"))
         )
-    except Exception:
+    except TimeoutException:
         print(f"Timeout en {cat}")
         continue
 

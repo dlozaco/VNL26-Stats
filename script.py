@@ -2,6 +2,7 @@ import time
 
 import pandas as pd
 import undetected_chromedriver as uc
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -354,7 +355,7 @@ def safe_text(selector, default="-"):
     """Extrae el contenido de texto de un elemento o devuelve un valor por defecto."""
     try:
         return driver.find_element(By.CSS_SELECTOR, selector).text.strip()
-    except Exception:
+    except NoSuchElementException:
         return default
 
 
@@ -365,7 +366,7 @@ def scrape_player(player_id):
         wait.until(
             EC.presence_of_element_located((By.CSS_SELECTOR, ".vbw-player-name"))
         )
-    except Exception:
+    except TimeoutException:
         print(f"  Timeout: {player_id}")
         return None
 
