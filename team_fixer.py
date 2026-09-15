@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv('vnl2026_TBD.csv')
+df = pd.read_csv("vnl2026_TBD.csv")
 
 correcciones_equipo = {
     "Luciano De Cecco": "ARGENTINA",
@@ -64,15 +64,17 @@ correcciones_equipo = {
     "Cody Hudson": "CANADA",
     "Valentin Predan": "SLOVENIA",
     "Jakub Ciunajtis": "POLAND",
-    "Zhihong Xue": "CHINA"
+    "Zhihong Xue": "CHINA",
 }
 
-df['team'] = df.apply(
-    lambda row: correcciones_equipo.get(row['name'], row['team']) 
-    if pd.isna(row['team']) or row['team'] in ["-", "TBD"] 
-    else row['team'], 
-    axis=1
+df["team"] = df.apply(
+    lambda row: (
+        correcciones_equipo.get(row["name"], row["team"])
+        if pd.isna(row["team"]) or row["team"] in ["-", "TBD"]
+        else row["team"]
+    ),
+    axis=1,
 )
 
-df.to_csv('vnl2026.csv', index=False)
+df.to_csv("vnl2026.csv", index=False)
 print("Saved filed as vnl2026.csv'")

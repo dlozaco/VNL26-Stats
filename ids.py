@@ -1,13 +1,19 @@
+import re
+import time
+
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
-import re
+from selenium.webdriver.support.ui import WebDriverWait
 
 categories = [
-    "best-scorers", "best-attackers", "best-blockers", "best-servers",
-    "best-setters", "best-diggers", "best-receivers"
+    "best-scorers",
+    "best-attackers",
+    "best-blockers",
+    "best-servers",
+    "best-setters",
+    "best-diggers",
+    "best-receivers",
 ]
 
 BASE = "https://es.volleyballworld.com/volleyball/competitions/volleyball-nations-league/statistics/men/"
@@ -21,7 +27,7 @@ all_ids = []
 for cat in categories:
     url = BASE + cat + "/"
     driver.get(url)
-    
+
     try:
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "a[href*='/players/']"))
@@ -33,7 +39,7 @@ for cat in categories:
     links = driver.find_elements(By.CSS_SELECTOR, "a[href*='/players/']")
     for link in links:
         href = link.get_attribute("href")
-        match = re.search(r'/players/(\d+)', href)
+        match = re.search(r"/players/(\d+)", href)
         if match:
             all_ids.append(int(match.group(1)))
 
